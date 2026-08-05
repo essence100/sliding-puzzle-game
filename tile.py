@@ -36,7 +36,6 @@ class Tile:
 
         self.speed = 15
 
-
         self.moving = False
 
 
@@ -48,7 +47,6 @@ class Tile:
         )
 
 
-        # UI
         self.font = pygame.font.SysFont(
             "arial",
             42,
@@ -56,13 +54,47 @@ class Tile:
         )
 
 
+        self.shadow_font = pygame.font.SysFont(
+            "arial",
+            42,
+            bold=True
+        )
+
+
+        self.tile_color = self.get_color()
+
+
+    # ======================
+    # COLORS
+    # ======================
+
+    def get_color(self):
+
+        colors = [
+
+            (56,189,248),
+            (34,211,238),
+            (99,102,241),
+            (168,85,247),
+            (236,72,153),
+            (14,165,233),
+            (16,185,129),
+            (245,158,11)
+
+        ]
+
+        return colors[self.number % len(colors)]
 
 
 
-    def move_to(self, x, y):
+
+    # ======================
+    # MOVE
+    # ======================
+
+    def move_to(self,x,y):
 
         self.target_x = x
-
         self.target_y = y
 
         self.moving = True
@@ -70,17 +102,15 @@ class Tile:
 
 
 
-
+    # ======================
+    # UPDATE
+    # ======================
 
     def update(self):
 
         if not self.moving:
-
             return
 
-
-
-        # X movement
 
         if self.x < self.target_x:
 
@@ -88,7 +118,6 @@ class Tile:
                 self.x + self.speed,
                 self.target_x
             )
-
 
         elif self.x > self.target_x:
 
@@ -99,9 +128,6 @@ class Tile:
 
 
 
-
-        # Y movement
-
         if self.y < self.target_y:
 
             self.y = min(
@@ -109,14 +135,12 @@ class Tile:
                 self.target_y
             )
 
-
         elif self.y > self.target_y:
 
             self.y = max(
                 self.y - self.speed,
                 self.target_y
             )
-
 
 
 
@@ -132,9 +156,11 @@ class Tile:
 
 
 
+    # ======================
+    # DRAW
+    # ======================
 
-
-    def draw(self, screen):
+    def draw(self,screen):
 
 
         self.rect.topleft = (
@@ -143,31 +169,33 @@ class Tile:
         )
 
 
-
         rect = pygame.Rect(
 
             int(self.x),
-
             int(self.y),
-
             self.size,
-
             self.size
 
         )
 
 
 
-        # Shadow
+        mouse = pygame.mouse.get_pos()
 
-        shadow_rect = pygame.Rect(
 
-            rect.x + 5,
+        hover = rect.collidepoint(mouse)
 
-            rect.y + 5,
 
+
+        # ======================
+        # 3D SHADOW
+        # ======================
+
+        shadow = pygame.Rect(
+
+            rect.x + 8,
+            rect.y + 10,
             rect.width,
-
             rect.height
 
         )
@@ -177,28 +205,77 @@ class Tile:
 
             screen,
 
-            (20,20,20),
+            (2,6,23),
 
-            shadow_rect,
+            shadow,
 
-            border_radius=15
+            border_radius=20
 
         )
 
 
 
 
+        # ======================
+        # TILE BODY
+        # ======================
 
-        # Tile body
+
+        color = self.tile_color
+
+
+        if hover:
+
+            color = tuple(
+                min(c+35,255)
+                for c in color
+            )
+
+
 
         pygame.draw.rect(
 
             screen,
 
-            WHITE,
+            color,
 
             rect,
 
+            border_radius=20
+
+        )
+
+
+
+
+
+        # ======================
+        # GLASS HIGHLIGHT
+        # ======================
+
+
+        highlight = pygame.Rect(
+
+            rect.x + 8,
+            rect.y + 8,
+            rect.width-16,
+            rect.height//3
+
+        )
+
+
+        pygame.draw.rect(
+
+            screen,
+
+            (
+                255,
+                255,
+                255
+            ),
+
+            highlight,
+
             border_radius=15
 
         )
@@ -207,19 +284,26 @@ class Tile:
 
 
 
-        # Border
+        # ======================
+        # BORDER
+        # ======================
+
 
         pygame.draw.rect(
 
             screen,
 
-            (100,100,100),
+            (
+                255,
+                255,
+                255
+            ),
 
             rect,
 
             width=2,
 
-            border_radius=15
+            border_radius=20
 
         )
 
@@ -227,7 +311,52 @@ class Tile:
 
 
 
-        # Number
+        # ======================
+        # NUMBER SHADOW
+        # ======================
+
+
+        shadow_text = self.shadow_font.render(
+
+            str(self.number),
+
+            True,
+
+            (15,23,42)
+
+        )
+
+
+        shadow_rect = shadow_text.get_rect(
+
+            center=(
+
+                rect.centerx+2,
+
+                rect.centery+3
+
+            )
+
+        )
+
+
+        screen.blit(
+
+            shadow_text,
+
+            shadow_rect
+
+        )
+
+
+
+
+
+
+        # ======================
+        # NUMBER
+        # ======================
+
 
         text = self.font.render(
 
@@ -235,10 +364,9 @@ class Tile:
 
             True,
 
-            BLACK
+            WHITE
 
         )
-
 
 
         text_rect = text.get_rect(
@@ -246,7 +374,6 @@ class Tile:
             center=rect.center
 
         )
-
 
 
         screen.blit(
