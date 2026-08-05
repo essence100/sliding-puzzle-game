@@ -21,9 +21,11 @@ class Game:
 
     def __init__(self):
 
+
         self.screen = pygame.display.set_mode(
             (WIDTH, HEIGHT)
         )
+
 
         pygame.display.set_caption(
             TITLE
@@ -33,10 +35,14 @@ class Game:
         self.clock = pygame.time.Clock()
 
 
+        # SYSTEMS
+
         self.level_manager = LevelManager()
 
         self.score_manager = ScoreManager()
 
+
+        # FONTS
 
         self.font = pygame.font.SysFont(
             "arial",
@@ -59,8 +65,12 @@ class Game:
         )
 
 
+        # MENU
+
         self.menu = Menu(self)
 
+
+        # GAME STATE
 
         self.state = "MENU"
 
@@ -68,35 +78,11 @@ class Game:
 
 
 
-        # buttons
-
-        self.restart_button = pygame.Rect(
-            WIDTH//2 - 250,
-            HEIGHT - 90,
-            160,
-            50
-        )
 
 
-        self.next_button = pygame.Rect(
-            WIDTH//2 - 80,
-            HEIGHT - 90,
-            160,
-            50
-        )
-
-
-        self.menu_button = pygame.Rect(
-            WIDTH//2 + 90,
-            HEIGHT - 90,
-            160,
-            50
-        )
-
-
-
-
-
+    # =================================
+    # CREATE GAME
+    # =================================
 
     def create_game(self):
 
@@ -130,10 +116,40 @@ class Game:
 
 
         self.player = Player(
-
             self.board,
-
             self
+        )
+
+
+
+        # WIN BUTTONS
+
+        self.restart_button = pygame.Rect(
+
+            WIDTH//2 - 100,
+            HEIGHT//2 + 70,
+            200,
+            45
+
+        )
+
+
+        self.next_button = pygame.Rect(
+
+            WIDTH//2 - 100,
+            HEIGHT//2 + 125,
+            200,
+            45
+
+        )
+
+
+        self.menu_button = pygame.Rect(
+
+            WIDTH//2 - 100,
+            HEIGHT//2 + 180,
+            200,
+            45
 
         )
 
@@ -141,6 +157,11 @@ class Game:
 
 
 
+
+
+    # =================================
+    # START LEVEL
+    # =================================
 
     def start_level(self, level):
 
@@ -159,6 +180,10 @@ class Game:
 
 
 
+    # =================================
+    # RESTART
+    # =================================
+
     def restart(self):
 
 
@@ -173,17 +198,9 @@ class Game:
 
 
 
-
-    def back_to_menu(self):
-
-
-        self.state = "MENU"
-
-
-
-
-
-
+    # =================================
+    # NEXT LEVEL
+    # =================================
 
     def next_level(self):
 
@@ -208,7 +225,24 @@ class Game:
 
 
 
+    # =================================
+    # BACK TO MENU
+    # =================================
 
+    def back_to_menu(self):
+
+
+        self.state = "MENU"
+
+
+
+
+
+
+
+    # =================================
+    # MOVES
+    # =================================
 
     def register_move(self):
 
@@ -230,6 +264,9 @@ class Game:
 
 
 
+    # =================================
+    # SCORE
+    # =================================
 
     def save_score(self):
 
@@ -257,6 +294,10 @@ class Game:
 
 
 
+    # =================================
+    # EVENTS
+    # =================================
+
     def handle_events(self):
 
 
@@ -277,7 +318,6 @@ class Game:
 
 
 
-
             elif self.state == "PLAYING":
 
 
@@ -289,35 +329,42 @@ class Game:
             elif self.state == "COMPLETED":
 
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
+
+                if event.type == pygame.KEYDOWN:
 
 
-                    if self.restart_button.collidepoint(event.pos):
+                    if event.key == pygame.K_r:
+
 
                         self.restart()
 
 
 
-                    elif self.menu_button.collidepoint(event.pos):
-
-                        self.back_to_menu()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
 
 
 
-                    elif (
-                        self.next_button.collidepoint(event.pos)
-                        and
-                        self.level_manager.current_level != "HARD"
-                    ):
+                    if self.restart_button.collidepoint(event.pos):
+
+
+                        self.restart()
+
+
+
+                    elif self.next_button.collidepoint(event.pos):
 
 
                         self.next_level()
 
 
 
+                    elif self.menu_button.collidepoint(event.pos):
 
 
-
+                        self.back_to_menu()
+                            # =================================
+    # UPDATE
+    # =================================
 
     def update(self):
 
@@ -332,6 +379,7 @@ class Game:
 
 
 
+        # TIMER
 
         if (
 
@@ -358,20 +406,28 @@ class Game:
 
 
 
+        # WIN CHECK
 
         if self.board.completed:
 
 
-            self.state = "COMPLETED"
+            if self.state != "COMPLETED":
 
 
-            self.save_score()
+                self.state = "COMPLETED"
+
+
+                self.save_score()
 
 
 
 
 
 
+
+    # =================================
+    # TITLE
+    # =================================
 
     def draw_title(self):
 
@@ -410,7 +466,74 @@ class Game:
 
 
 
+    # =================================
+    # LEVEL DISPLAY
+    # =================================
 
+    def draw_level(self):
+
+
+        level_text = self.small_font.render(
+
+            f"LEVEL: {self.level_manager.current_level}",
+
+            True,
+
+            (56,189,248)
+
+        )
+
+
+        size_text = self.small_font.render(
+
+            f"{self.level_manager.get_size()} x {self.level_manager.get_size()}",
+
+            True,
+
+            (255,255,255)
+
+        )
+
+
+
+        self.screen.blit(
+
+            level_text,
+
+            (
+
+                WIDTH//2 - 70,
+
+                65
+
+            )
+
+        )
+
+
+        self.screen.blit(
+
+            size_text,
+
+            (
+
+                WIDTH//2 - 35,
+
+                95
+
+            )
+
+        )
+
+
+
+
+
+
+
+    # =================================
+    # TIMER + MOVES
+    # =================================
 
     def draw_info(self):
 
@@ -433,7 +556,8 @@ class Game:
         )
 
 
-        move_text = self.timer_font.render(
+
+        moves_text = self.timer_font.render(
 
             f"MOVES: {self.moves}",
 
@@ -444,20 +568,29 @@ class Game:
         )
 
 
+
+
         self.screen.blit(
 
             time_text,
 
-            (35,95)
+            (35,120)
 
         )
+
 
 
         self.screen.blit(
 
-            move_text,
+            moves_text,
 
-            (WIDTH-170,95)
+            (
+
+                WIDTH-170,
+
+                120
+
+            )
 
         )
 
@@ -468,10 +601,19 @@ class Game:
 
 
 
+
+    # =================================
+    # BUTTON DRAW
+    # =================================
+
     def draw_button(
+
         self,
+
         rect,
+
         text
+
     ):
 
 
@@ -488,6 +630,7 @@ class Game:
         )
 
 
+
         label = self.small_font.render(
 
             text,
@@ -497,6 +640,7 @@ class Game:
             (0,0,0)
 
         )
+
 
 
         self.screen.blit(
@@ -510,21 +654,16 @@ class Game:
             )
 
         )
-
-
-
-
-
-
-
-
+            # =================================
+    # WIN SCREEN
+    # =================================
 
     def draw_win_screen(self):
 
 
         overlay = pygame.Surface(
 
-            (WIDTH,HEIGHT),
+            (WIDTH, HEIGHT),
 
             pygame.SRCALPHA
 
@@ -548,7 +687,6 @@ class Game:
 
 
 
-
         title = self.font.render(
 
             "🏆 YOU WIN!",
@@ -560,8 +698,7 @@ class Game:
         )
 
 
-
-        score = self.small_font.render(
+        score_text = self.small_font.render(
 
             f"SCORE: {self.final_score}",
 
@@ -572,14 +709,24 @@ class Game:
         )
 
 
-
-        level = self.small_font.render(
+        level_text = self.small_font.render(
 
             f"LEVEL: {self.level_manager.current_level}",
 
             True,
 
-            (0,255,120)
+            (56,189,248)
+
+        )
+
+
+        moves_text = self.small_font.render(
+
+            f"MOVES: {self.moves}",
+
+            True,
+
+            (255,255,255)
 
         )
 
@@ -595,7 +742,7 @@ class Game:
 
                     WIDTH//2,
 
-                    HEIGHT//2-100
+                    HEIGHT//2-120
 
                 )
 
@@ -607,15 +754,15 @@ class Game:
 
         self.screen.blit(
 
-            score,
+            score_text,
 
-            score.get_rect(
+            score_text.get_rect(
 
                 center=(
 
                     WIDTH//2,
 
-                    HEIGHT//2-50
+                    HEIGHT//2-70
 
                 )
 
@@ -627,9 +774,29 @@ class Game:
 
         self.screen.blit(
 
-            level,
+            level_text,
 
-            level.get_rect(
+            level_text.get_rect(
+
+                center=(
+
+                    WIDTH//2,
+
+                    HEIGHT//2-35
+
+                )
+
+            )
+
+        )
+
+
+
+        self.screen.blit(
+
+            moves_text,
+
+            moves_text.get_rect(
 
                 center=(
 
@@ -645,6 +812,10 @@ class Game:
 
 
 
+
+        # BUTTONS
+
+
         self.draw_button(
 
             self.restart_button,
@@ -652,6 +823,7 @@ class Game:
             "RESTART"
 
         )
+
 
 
         if self.level_manager.current_level != "HARD":
@@ -664,6 +836,7 @@ class Game:
                 "NEXT"
 
             )
+
 
 
         self.draw_button(
@@ -679,6 +852,12 @@ class Game:
 
 
 
+
+
+
+    # =================================
+    # DRAW
+    # =================================
 
     def draw(self):
 
@@ -712,6 +891,9 @@ class Game:
         self.draw_title()
 
 
+        self.draw_level()
+
+
         self.draw_info()
 
 
@@ -724,12 +906,10 @@ class Game:
 
 
 
-
         if self.state == "COMPLETED":
 
 
             self.draw_win_screen()
-
 
 
 
@@ -741,6 +921,10 @@ class Game:
 
 
 
+
+    # =================================
+    # MAIN LOOP
+    # =================================
 
     def run(self):
 

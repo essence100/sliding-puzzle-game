@@ -6,7 +6,6 @@ from settings import (
 )
 
 
-
 class Menu:
 
 
@@ -18,7 +17,7 @@ class Menu:
 
         self.font = pygame.font.SysFont(
             "arial",
-            40,
+            42,
             bold=True
         )
 
@@ -30,34 +29,58 @@ class Menu:
         )
 
 
-
         self.buttons = {
 
 
             "EASY": pygame.Rect(
-                WIDTH//2 - 100,
-                180,
-                200,
-                55
+                WIDTH//2 - 120,
+                190,
+                240,
+                60
             ),
 
 
             "MEDIUM": pygame.Rect(
-                WIDTH//2 - 100,
-                270,
-                200,
-                55
+                WIDTH//2 - 120,
+                290,
+                240,
+                60
             ),
 
 
             "HARD": pygame.Rect(
-                WIDTH//2 - 100,
-                360,
-                200,
-                55
+                WIDTH//2 - 120,
+                390,
+                240,
+                60
             )
 
         }
+
+
+
+        self.hover_color = (
+            125,
+            211,
+            252
+        )
+
+
+        self.normal_color = (
+            56,
+            189,
+            248
+        )
+
+
+
+        self.text_color = (
+            0,
+            0,
+            0
+        )
+
+
 
 
 
@@ -67,13 +90,17 @@ class Menu:
         if event.type == pygame.MOUSEBUTTONDOWN:
 
 
-            for level,button in self.buttons.items():
+            if event.button == 1:
 
 
-                if button.collidepoint(event.pos):
+                for level, button in self.buttons.items():
 
 
-                    self.game.start_level(level)
+                    if button.collidepoint(event.pos):
+
+
+                        self.game.start_level(level)
+
 
 
 
@@ -87,6 +114,7 @@ class Menu:
         screen.fill(
             (2,6,23)
         )
+
 
 
         title = self.font.render(
@@ -110,7 +138,7 @@ class Menu:
 
                     WIDTH//2,
 
-                    80
+                    90
 
                 )
 
@@ -122,20 +150,80 @@ class Menu:
 
 
 
-        for level,button in self.buttons.items():
+        subtitle = self.small_font.render(
+
+            "Choose Difficulty",
+
+            True,
+
+            (148,163,184)
+
+        )
+
+
+        screen.blit(
+
+            subtitle,
+
+            subtitle.get_rect(
+
+                center=(
+
+                    WIDTH//2,
+
+                    140
+
+                )
+
+            )
+
+        )
+
+
+
+
+
+
+        mouse_pos = pygame.mouse.get_pos()
+
+
+
+
+
+        for level, button in self.buttons.items():
+
+
+
+            if button.collidepoint(mouse_pos):
+
+
+                color = self.hover_color
+
+
+            else:
+
+
+                color = self.normal_color
+
+
+
+
 
 
             pygame.draw.rect(
 
                 screen,
 
-                (56,189,248),
+                color,
 
                 button,
 
-                border_radius=12
+                border_radius=15
 
             )
+
+
+
 
 
             text = self.small_font.render(
@@ -144,9 +232,11 @@ class Menu:
 
                 True,
 
-                (0,0,0)
+                self.text_color
 
             )
+
+
 
 
             screen.blit(
